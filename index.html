@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pterodactyl Panel Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-box p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .package-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .package-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .package-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .package-card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .package-card p {
+            font-size: 11px;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        .result-box h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 10px;
+            color: #667eea;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦖 Pterodactyl Panel Creator</h1>
+            <p>Buat Panel Pterodactyl dengan Mudah</p>
+        </div>
+
+        <div class="content">
+            <div id="alert" class="alert"></div>
+
+            <div class="info-box">
+                <h3>📦 Pilih Paket Server</h3>
+                <p>Pilih paket sesuai kebutuhan, lalu masukkan username untuk membuat panel</p>
+            </div>
+
+            <form id="createPanelForm">
+                <div class="package-grid">
+                    <div class="package-card" data-package="1gb">
+                        <h3>1 GB</h3>
+                        <p>RAM: 1GB<br>Disk: 1GB<br>CPU: 40%</p>
+                    </div>
+                    <div class="package-card" data-package="2gb">
+                        <h3>2 GB</h3>
+                        <p>RAM: 2GB<br>Disk: 1GB<br>CPU: 60%</p>
+                    </div>
+                    <div class="package-card" data-package="3gb">
+                        <h3>3 GB</h3>
+                        <p>RAM: 3GB<br>Disk: 2GB<br>CPU: 80%</p>
+                    </div>
+                    <div class="package-card" data-package="4gb">
+                        <h3>4 GB</h3>
+                        <p>RAM: 4GB<br>Disk: 2GB<br>CPU: 100%</p>
+                    </div>
+                    <div class="package-card" data-package="5gb">
+                        <h3>5 GB</h3>
+                        <p>RAM: 5GB<br>Disk: 3GB<br>CPU: 120%</p>
+                    </div>
+                    <div class="package-card" data-package="6gb">
+                        <h3>6 GB</h3>
+                        <p>RAM: 6GB<br>Disk: 3GB<br>CPU: 140%</p>
+                    </div>
+                    <div class="package-card" data-package="7gb">
+                        <h3>7 GB</h3>
+                        <p>RAM: 7GB<br>Disk: 4GB<br>CPU: 160%</p>
+                    </div>
+                    <div class="package-card" data-package="8gb">
+                        <h3>8 GB</h3>
+                        <p>RAM: 8GB<br>Disk: 4GB<br>CPU: 180%</p>
+                    </div>
+                    <div class="package-card" data-package="9gb">
+                        <h3>9 GB</h3>
+                        <p>RAM: 9GB<br>Disk: 5GB<br>CPU: 200%</p>
+                    </div>
+                    <div class="package-card" data-package="10gb">
+                        <h3>10 GB</h3>
+                        <p>RAM: 10GB<br>Disk: 5GB<br>CPU: 220%</p>
+                    </div>
+                    <div class="package-card" data-package="unlimited">
+                        <h3>♾️ UNLI</h3>
+                        <p>Unlimited<br>Resources</p>
+                    </div>
+                </div>
+
+                <input type="hidden" id="selectedPackage" required>
+
+                <div class="form-group">
+                    <label>Username *</label>
+                    <input type="text" id="username" required placeholder="Masukkan username (contoh: johnsmith)">
+                </div>
+
+                <div id="loading" class="loading" style="display: none;"></div>
+
+                <button type="submit" class="btn">🚀 Buat Panel Sekarang</button>
+            </form>
+
+            <div id="resultBox" class="result-box">
+                <h3>✅ Panel Berhasil Dibuat!</h3>
+                <div id="resultContent"></div>
+                <button class="copy-btn" onclick="copyResult()">📋 Copy Data Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPackage = null;
+        let panelData = {};
+
+        // Package selection
+        document.querySelectorAll('.package-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPackage = this.dataset.package;
+                document.getElementById('selectedPackage').value = selectedPackage;
+            });
+        });
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert ${type} show`;
+            alert.innerHTML = message;
+            setTimeout(() => alert.classList.remove('show'), 8000);
+        }
+
+        function showLoading(message) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loading').textContent = message;
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function formatDate() {
+            const date = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('id-ID', options);
+        }
+
+        function displayResult(data) {
+            document.getElementById('resultContent').innerHTML = `
+                <div class="result-item"><strong>📡 ID Server:</strong> <span>${data.serverId}</span></div>
+                <div class="result-item"><strong>👤 Username:</strong> <span>${data.username}</span></div>
+                <div class="result-item"><strong>🔐 Password:</strong> <span>${data.password}</span></div>
+                <div class="result-item"><strong>📧 Email:</strong> <span>${data.email}</span></div>
+                <div class="result-item"><strong>🗓️ Tanggal:</strong> <span>${data.date}</span></div>
+                <div class="result-item"><strong>💾 RAM:</strong> <span>${data.ram}</span></div>
+                <div class="result-item"><strong>💿 Disk:</strong> <span>${data.disk}</span></div>
+                <div class="result-item"><strong>⚡ CPU:</strong> <span>${data.cpu}</span></div>
+                <div class="result-item"><strong>🌐 Login:</strong> <span>${data.domain}</span></div>
+            `;
+
+            panelData = data;
+            document.getElementById('resultBox').classList.add('show');
+        }
+
+        function copyResult() {
+            const text = `*Berikut Detail Akun Panel Kamu 📦*
+
+*📡 ID Server: ${panelData.serverId}*
+*👤 Username: ${panelData.username}*
+*🔐 Password: ${panelData.password}*
+*📧 Email: ${panelData.email}*
+*🗓️ ${panelData.date}*
+
+*🌐 Spesifikasi Server*
+* RAM: ${panelData.ram}
+* Disk: ${panelData.disk}
+* CPU: ${panelData.cpu}
+* ${panelData.domain}
+
+*Syarat & Ketentuan:*
+* Expired panel 1 bulan
+* Simpan data ini sebaik mungkin
+* Garansi pembelian 15 hari (1x replace)
+* Claim garansi wajib membawa bukti chat pembelian`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showAlert('✅ Data panel berhasil di-copy!', 'success');
+            }).catch(() => {
+                showAlert('❌ Gagal copy data', 'error');
+            });
+        }
+
+        document.getElementById('createPanelForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!selectedPackage) {
+                showAlert('❌ Pilih paket terlebih dahulu!', 'error');
+                return;
+            }
+
+            const btn = e.target.querySelector('.btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Sedang Proses...';
+            
+            const username = document.getElementById('username').value.toLowerCase().trim();
+
+            try {
+                showLoading('⏳ Membuat user...');
+
+                const response = await fetch('/.netlify/functions/create-panel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        package: selectedPackage
+                    })
+                });
+
+                const result = await response.json();
+                hideLoading();
+
+                if (result.success) {
+                    showAlert('✅ Panel berhasil dibuat!', 'success');
+                    displayResult(result.data);
+
+                    // Reset form
+                    document.getElementById('username').value = '';
+                    document.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected'));
+                    selectedPackage = null;
+                } else {
+                    throw new Error(result.message || 'Terjadi kesalahan');
+                }
+
+            } catch (error) {
+                hideLoading();
+                console.error('Error:', error);
+                showAlert('❌ Error: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Buat Panel Sekarang';
+            }
+        });
+    </script>
+</body>
+              </html>
